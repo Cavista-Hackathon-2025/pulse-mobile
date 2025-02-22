@@ -1,7 +1,18 @@
-import * as WebBrowser from 'expo-web-browser';
-import Constants from 'expo-constants';
-import * as Linking from 'expo-linking';
+import { Alert } from "react-native";
+import * as WebBrowser from "expo-web-browser";
+import Constants from "expo-constants";
+import * as Linking from "expo-linking";
 
+export const alertProgressNotSaved = (
+    heading: string,
+    continueFn: () => void
+) => {
+    Alert.alert(
+        `${heading || "Are you sure?"}`,
+        "Your progress will not be saved",
+        [{ text: "Cancel" }, { text: "Yes", onPress: () => continueFn() }]
+    );
+};
 
 export const handleRedirect = async (
     event: Linking.EventType,
