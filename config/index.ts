@@ -2,7 +2,8 @@ import * as SecureStore from "expo-secure-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AppConfig = {
-    FARMCERIES_API: process.env.EXPO_PUBLIC_FARMCERIES_API as string,
+    AI_API_KEY: process.env.EXPO_PUBLIC_AI_API_KEY as string,
+    PULSE_API: process.env.EXPO_PUBLIC_PULSE_API as string,
     GOOGLE_DIRECTIONS_API_KEY: process.env
         .EXPO_PUBLIC_GOOGLE_DIRECTIONS_API_KEY as string,
     OTP_RESEND_DELAY: Number(

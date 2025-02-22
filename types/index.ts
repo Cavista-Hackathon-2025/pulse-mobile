@@ -12,10 +12,11 @@ export interface IAccount extends MongoDBDocumentWithTimestamps {
     lastName?: string;
     email: string;
     hospitalName?: string;
+    role: UserRole;
 }
 
 export interface HealthRecord {
-    data: string;
+    date: string;
     hospital: IHospital;
     medicalReport: string;
     treatedFor: string[];
@@ -134,3 +135,10 @@ export type User = {
     profileByRole: IUserFields;
     token: string;
 };
+
+export enum Position {
+    BOTTOM = "bottom",
+    LEFT = "left",
+    RIGHT = "right",
+    TOP = "top",
+}
