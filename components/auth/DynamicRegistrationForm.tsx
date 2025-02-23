@@ -24,7 +24,6 @@ import AppButton from '@/components/global/AppButton';
 import FormGroup from '@/components/global/FormGroup';
 import FieldLabel from '@/components/global/FieldLabel';
 import AppModalSelector from '@/components/global/AppModalSelector';
-import FindAddress from '@/components/FindAddress';
 
 interface DynamicRegistrationFormProps {
   accountToUpdate?: User | null;
@@ -111,7 +110,7 @@ const DynamicRegistrationForm: FC<DynamicRegistrationFormProps> = ({
       let response;
       if (accountToUpdate?.baseProfile?._id) {
         response = await axiosInstance.put(
-          /api/v1/accounts/${accountToUpdate.baseProfile._id},
+          `/api/v1/accounts/${accountToUpdate.baseProfile._id}`,
           { baseProfile: vals, profileByRole: {} }
         );
       } else {
@@ -129,7 +128,7 @@ const DynamicRegistrationForm: FC<DynamicRegistrationFormProps> = ({
           const { token, ...userData } = newUser;
           await AppSecureStore.set('token', token);
           await AppLocalStorage.set('user', userData);
-          axiosInstance.defaults.headers.common.Authorization = Bearer ${token};
+          axiosInstance.defaults.headers.common.Authorization = `Bearer ${token}`;
           router.replace('/');
         }
       } else {
@@ -146,246 +145,280 @@ const DynamicRegistrationForm: FC<DynamicRegistrationFormProps> = ({
   };
 
   return (
-    <Formik
-      initialValues={initialValues}
-      validationSchema={validationSchema}
-      onSubmit={onSubmit}
-      validateOnBlur
-      validateOnChange
-    >
-      {({
-        handleSubmit,
-        handleChange,
-        handleBlur,
-        values,
-        errors,
-        touched,
-        isSubmitting,
-        setFieldValue,
-      }) => (
-        <View className="flex-1">
-          <FormGroup title="Basic Information">
-            <View className="mb-4">
-              <FieldLabel label="First Name" />
-              <AppTextInput
-                onChangeText={handleChange('firstName')}
-                onBlur={handleBlur('firstName')}
-                value={values.firstName || ''}
-                placeholder="First Name"
-                customStyles={`mb-2 ${
-                  touched.firstName && errors.firstName ? 'border-red-200 bg-red-100' : ''
-                }`}
-              />
-              {touched.firstName && errors.firstName && (
-                <AppText customStyles="text-red-500">{errors.firstName}</AppText>
-              )}
-            </View>
+      <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={onSubmit}
+          validateOnBlur
+          validateOnChange
+      >
+          {({
+              handleSubmit,
+              handleChange,
+              handleBlur,
+              values,
+              errors,
+              touched,
+              isSubmitting,
+              setFieldValue,
+          }) => (
+              <View className="flex-1">
+                  <FormGroup title="Basic Information">
+                      <View className="mb-4">
+                          <FieldLabel label="First Name" />
+                          <AppTextInput
+                              onChangeText={handleChange("firstName")}
+                              onBlur={handleBlur("firstName")}
+                              value={values.firstName || ""}
+                              placeholder="First Name"
+                              customStyles={`mb-2 ${
+                                  touched.firstName && errors.firstName
+                                      ? "border-red-200 bg-red-100"
+                                      : ""
+                              }`}
+                          />
+                          {touched.firstName && errors.firstName && (
+                              <AppText customStyles="text-red-500">
+                                  {errors.firstName}
+                              </AppText>
+                          )}
+                      </View>
 
-            <View className="mb-4">
-              <FieldLabel label="Last Name" />
-              <AppTextInput
-                onChangeText={handleChange('lastName')}
-                onBlur={handleBlur('lastName')}
-                value={values.lastName || ''}
-                placeholder="Last Name"
-                customStyles={`mb-2 ${
-                  touched.lastName && errors.lastName ? 'border-red-200 bg-red-100' : ''
-                }`}
-              />
-              {touched.lastName && errors.lastName && (
-                <AppText customStyles="text-red-500">{errors.lastName}</AppText>
-              )}
-            </View>
+                      <View className="mb-4">
+                          <FieldLabel label="Last Name" />
+                          <AppTextInput
+                              onChangeText={handleChange("lastName")}
+                              onBlur={handleBlur("lastName")}
+                              value={values.lastName || ""}
+                              placeholder="Last Name"
+                              customStyles={`mb-2 ${
+                                  touched.lastName && errors.lastName
+                                      ? "border-red-200 bg-red-100"
+                                      : ""
+                              }`}
+                          />
+                          {touched.lastName && errors.lastName && (
+                              <AppText customStyles="text-red-500">
+                                  {errors.lastName}
+                              </AppText>
+                          )}
+                      </View>
 
-            <View className="mb-4">
-              <FieldLabel label="Email" />
-              <AppTextInput
-                onChangeText={handleChange('email')}
-                onBlur={handleBlur('email')}
-                value={values.email || ''}
-                placeholder="me@example.com"
-                keyboardType="email-address"
-                customStyles={`mb-2 ${
-                  touched.email && errors.email ? 'border-red-200 bg-red-100' : ''
-                }`}
-              />
-              {touched.email && errors.email && (
-                <AppText customStyles="text-red-500">{errors.email}</AppText>
-              )}
-            </View>
-          </FormGroup>
+                      <View className="mb-4">
+                          <FieldLabel label="Email" />
+                          <AppTextInput
+                              onChangeText={handleChange("email")}
+                              onBlur={handleBlur("email")}
+                              value={values.email || ""}
+                              placeholder="me@example.com"
+                              keyboardType="email-address"
+                              customStyles={`mb-2 ${
+                                  touched.email && errors.email
+                                      ? "border-red-200 bg-red-100"
+                                      : ""
+                              }`}
+                          />
+                          {touched.email && errors.email && (
+                              <AppText customStyles="text-red-500">
+                                  {errors.email}
+                              </AppText>
+                          )}
+                      </View>
+                  </FormGroup>
 
-          {userRole === UserRole.HOSPITAL && (
-            <FormGroup title="Hospital Details">
-              <View className="mb-4">
-                <FieldLabel label="Hospital Name" />
-                <AppTextInput
-                  onChangeText={handleChange('hospitalName')}
-                  onBlur={handleBlur('hospitalName')}
-                  value={values.hospitalName || ''}
-                  placeholder="Hospital Name"
-                  customStyles={`mb-2 ${
-                    touched.hospitalName && errors.hospitalName
-                      ? 'border-red-200 bg-red-100'
-                      : ''
-                  }`}
-                />
-                {touched.hospitalName && errors.hospitalName && (
-                  <AppText customStyles="text-red-500">{errors.hospitalName}</AppText>
-                )}
-              </View>
+                  {userRole === UserRole.HOSPITAL && (
+                      <FormGroup title="Hospital Details">
+                          <View className="mb-4">
+                              <FieldLabel label="Hospital Name" />
+                              <AppTextInput
+                                  onChangeText={handleChange("hospitalName")}
+                                  onBlur={handleBlur("hospitalName")}
+                                  value={values.hospitalName || ""}
+                                  placeholder="Hospital Name"
+                                  customStyles={`mb-2 ${
+                                      touched.hospitalName &&
+                                      errors.hospitalName
+                                          ? "border-red-200 bg-red-100"
+                                          : ""
+                                  }`}
+                              />
+                              {touched.hospitalName && errors.hospitalName && (
+                                  <AppText customStyles="text-red-500">
+                                      {errors.hospitalName}
+                                  </AppText>
+                              )}
+                          </View>
 
-              <View className="mb-4">
-                <FieldLabel label="Hospital Location" />
-                <FindAddress
-                  localStorageKey="hospitalLocation"
-                  queryString="components=country:ng"
-                  setResult={(addr) => {
-                    setFieldValue('location', {
-                      formattedAddress: addr.formatted_address,
-                      coordinates: addr.geometry.location,
-                      placeId: addr.place_id,
-                    });
-                  }}
-                >
-                  <AppTextInput
-                    value={typeof values.location === 'object' && values.location?.type
-                      ? (values.location as any).type.formattedAddress
-                      : ''}
-                    placeholder="Tap to select hospital address"
-                    customStyles={`mb-2 ${
-                      touched.location && errors.location ? 'border-red-200 bg-red-100' : ''
-                    }`}
-                  />
-                </FindAddress>
-                {touched.location && errors.location && (
-                  <AppText customStyles="text-red-500">
-                    {typeof errors.location === 'string'
-                      ? errors.location
-                      : 'Location is required'}
-                  </AppText>
-                )}
-              </View>
+                          <View className="mb-4">
+                              <FieldLabel label="Hospital Location" />
+                              <AppTextInput
+                                  onChangeText={handleChange(
+                                      "hospitalLocation"
+                                  )}
+                                  onBlur={handleBlur("hospitalLocation")}
+                                  value={values.location.formattedAddress || ""}
+                                  placeholder="Hospital Location"
+                                  customStyles={`mb-2 ${
+                                      touched.location &&
+                                      errors.location
+                                          ? "border-red-200 bg-red-100"
+                                          : ""
+                                  }`}
+                              />
+                              {touched.location && errors.location && (
+                                  <AppText customStyles="text-red-500">
+                                      {typeof errors.location === "string"
+                                          ? errors.location
+                                          : "Location is required"}
+                                  </AppText>
+                              )}
+                          </View>
 
-              <View className="mb-4">
-                <FieldLabel label="Specialties (comma-separated)" />
-                <AppTextInput
-                  onChangeText={handleChange('specialties')}
-                  onBlur={handleBlur('specialties')}
-                  value={(values as any).specialties || ''}
-                  placeholder="e.g cardiology, neurology"
-                  customStyles={`mb-2 ${
-                    touched.specialties && errors.specialties
-                      ? 'border-red-200 bg-red-100'
-                      : ''
-                  }`}
-                />
-                {touched.specialties && errors.specialties && (
-                  <AppText customStyles="text-red-500">{errors.specialties as string}</AppText>
-                )}
-              </View>
-            </FormGroup>
-          )}
-
-          {userRole === UserRole.MED_TRANSPORT && (
-            <FormGroup title="Medical Transport Details">
-              <View className="mb-4">
-                <FieldLabel label="Type" />
-                <AppTextInput
-                  onChangeText={handleChange('type')}
-                  onBlur={handleBlur('type')}
-                  value={(values as any).type || ''}
-                  placeholder="e.g private_ambulance"
-                  customStyles={`mb-2 ${
-                    touched.type && errors.type ? 'border-red-200 bg-red-100' : ''
-                  }`}
-                />
-                {touched.type && errors.type && (
-                  <AppText customStyles="text-red-500">{errors.type as string}</AppText>
-                )}
-              </View>
-
-              {values.type === 'private_ambulance' && (
-                <View className="mb-4">
-                  <FieldLabel label="Linked Hospital" />
-                  <AppModalSelector
-                    allowSearch
-                    hasError={touched.hospital && !!errors.hospital}
-                    keyExtractor="_id"
-                    labelExtractor={(item) =>
-                      (item as IHospital)?.hospitalName || 'Unknown Hospital'
-                    }
-                    onSelect={(val) => setFieldValue('hospital', (val as IHospital)._id)}
-                    options={hospitals as Record<string, any>[]}
-                    selectionTitle="Select Hospital"
-                    value={(values as any).hospital || ''}
-                  />
-                  {touched.hospital && errors.hospital && (
-                    <AppText customStyles="text-red-500">{errors.hospital as string}</AppText>
+                          <View className="mb-4">
+                              <FieldLabel label="Specialties (comma-separated)" />
+                              <AppTextInput
+                                  onChangeText={handleChange("specialties")}
+                                  onBlur={handleBlur("specialties")}
+                                  value={(values as any).specialties || ""}
+                                  placeholder="e.g cardiology, neurology"
+                                  customStyles={`mb-2 ${
+                                      touched.specialties && errors.specialties
+                                          ? "border-red-200 bg-red-100"
+                                          : ""
+                                  }`}
+                              />
+                              {touched.specialties && errors.specialties && (
+                                  <AppText customStyles="text-red-500">
+                                      {errors.specialties as string}
+                                  </AppText>
+                              )}
+                          </View>
+                      </FormGroup>
                   )}
-                </View>
-              )}
-            </FormGroup>
-          )}
 
-          {userRole === UserRole.PATIENT && (
-            <FormGroup title="Patient Details">
-              <View className="mb-4">
-                <FieldLabel label="Past Health Summary" />
-                <AppTextInput
-                  multiline
-                  numberOfLines={4}
-                  onChangeText={handleChange('pastHealthSummary')}
-                  onBlur={handleBlur('pastHealthSummary')}
-                  value={(values as any).pastHealthSummary || ''}
-                  placeholder="Describe relevant history..."
-                  customStyles={`mb-2 ${
-                    touched.pastHealthSummary && errors.pastHealthSummary
-                      ? 'border-red-200 bg-red-100'
-                      : ''
-                  }`}
-                />
-                {touched.pastHealthSummary && errors.pastHealthSummary && (
-                  <AppText customStyles="text-red-500">
-                    {errors.pastHealthSummary as string}
-                  </AppText>
-                )}
+                  {userRole === UserRole.MED_TRANSPORT && (
+                      <FormGroup title="Medical Transport Details">
+                          <View className="mb-4">
+                              <FieldLabel label="Type" />
+                              <AppTextInput
+                                  onChangeText={handleChange("type")}
+                                  onBlur={handleBlur("type")}
+                                  value={(values as any).type || ""}
+                                  placeholder="e.g private_ambulance"
+                                  customStyles={`mb-2 ${
+                                      touched.type && errors.type
+                                          ? "border-red-200 bg-red-100"
+                                          : ""
+                                  }`}
+                              />
+                              {touched.type && errors.type && (
+                                  <AppText customStyles="text-red-500">
+                                      {errors.type as string}
+                                  </AppText>
+                              )}
+                          </View>
+
+                          {values.type === "private_ambulance" && (
+                              <View className="mb-4">
+                                  <FieldLabel label="Linked Hospital" />
+                                  <AppModalSelector
+                                      allowSearch
+                                      hasError={
+                                          touched.hospital && !!errors.hospital
+                                      }
+                                      keyExtractor="_id"
+                                      labelExtractor={(item) =>
+                                          (item as IHospital)?.hospitalName ||
+                                          "Unknown Hospital"
+                                      }
+                                      onSelect={(val) =>
+                                          setFieldValue(
+                                              "hospital",
+                                              (val as IHospital)._id
+                                          )
+                                      }
+                                      options={
+                                          hospitals as Record<string, any>[]
+                                      }
+                                      selectionTitle="Select Hospital"
+                                      value={(values as any).hospital || ""}
+                                  />
+                                  {touched.hospital && errors.hospital && (
+                                      <AppText customStyles="text-red-500">
+                                          {errors.hospital as string}
+                                      </AppText>
+                                  )}
+                              </View>
+                          )}
+                      </FormGroup>
+                  )}
+
+                  {userRole === UserRole.PATIENT && (
+                      <FormGroup title="Patient Details">
+                          <View className="mb-4">
+                              <FieldLabel label="Past Health Summary" />
+                              <AppTextInput
+                                  multiline
+                                  numberOfLines={4}
+                                  onChangeText={handleChange(
+                                      "pastHealthSummary"
+                                  )}
+                                  onBlur={handleBlur("pastHealthSummary")}
+                                  value={
+                                      (values as any).pastHealthSummary || ""
+                                  }
+                                  placeholder="Describe relevant history..."
+                                  customStyles={`mb-2 ${
+                                      touched.pastHealthSummary &&
+                                      errors.pastHealthSummary
+                                          ? "border-red-200 bg-red-100"
+                                          : ""
+                                  }`}
+                              />
+                              {touched.pastHealthSummary &&
+                                  errors.pastHealthSummary && (
+                                      <AppText customStyles="text-red-500">
+                                          {errors.pastHealthSummary as string}
+                                      </AppText>
+                                  )}
+                          </View>
+
+                          <View className="mb-4">
+                              <FieldLabel label="Known Ailments (comma-separated)" />
+                              <AppTextInput
+                                  multiline
+                                  numberOfLines={2}
+                                  onChangeText={handleChange("knownAilments")}
+                                  onBlur={handleBlur("knownAilments")}
+                                  value={(values as any).knownAilments || ""}
+                                  placeholder="e.g hypertension, anemia"
+                                  customStyles={`mb-2 ${
+                                      touched.knownAilments &&
+                                      errors.knownAilments
+                                          ? "border-red-200 bg-red-100"
+                                          : ""
+                                  }`}
+                              />
+                              {touched.knownAilments &&
+                                  errors.knownAilments && (
+                                      <AppText customStyles="text-red-500">
+                                          {errors.knownAilments as string}
+                                      </AppText>
+                                  )}
+                          </View>
+                      </FormGroup>
+                  )}
+
+                  <AppButton
+                      buttonText={submitButtonText}
+                      customStyles={submitButtonCustomStyles}
+                      disabled={isSubmitting}
+                      isLoading={isSubmitting}
+                      onPress={handleSubmit}
+                  />
               </View>
-
-              <View className="mb-4">
-                <FieldLabel label="Known Ailments (comma-separated)" />
-                <AppTextInput
-                  multiline
-                  numberOfLines={2}
-                  onChangeText={handleChange('knownAilments')}
-                  onBlur={handleBlur('knownAilments')}
-                  value={(values as any).knownAilments || ''}
-                  placeholder="e.g hypertension, anemia"
-                  customStyles={`mb-2 ${
-                    touched.knownAilments && errors.knownAilments
-                      ? 'border-red-200 bg-red-100'
-                      : ''
-                  }`}
-                />
-                {touched.knownAilments && errors.knownAilments && (
-                  <AppText customStyles="text-red-500">
-                    {errors.knownAilments as string}
-                  </AppText>
-                )}
-              </View>
-            </FormGroup>
           )}
-
-          <AppButton
-            buttonText={submitButtonText}
-            customStyles={submitButtonCustomStyles}
-            disabled={isSubmitting}
-            isLoading={isSubmitting}
-            onPress={handleSubmit}
-          />
-        </View>
-      )}
-    </Formik>
+      </Formik>
   );
 };
 
