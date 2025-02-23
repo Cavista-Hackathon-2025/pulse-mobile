@@ -1,74 +1,136 @@
-import React from "react";
-import { View, Modal, Dimensions, type ScaledSize } from "react-native";
-import Carousel, {
-    type ICarouselInstance,
-} from "react-native-reanimated-carousel";
-
-import AppText from "@/components/global/AppText";
+import { View, useWindowDimensions, ViewToken, Platform } from "react-native";
+import React, { useMemo, useRef, useState } from "react";
+import Animated, {
+    useAnimatedScrollHandler,
+    useSharedValue,
+} from "react-native-reanimated";
+import UserTypeCarouselItem from "@/components/auth/UserTypeCarouselItem";
 import AppButton from "@/components/global/AppButton";
-import { UserRole } from "@/types";
+import { UserRole, UserType } from "@/types";
+import AppText from "../global/AppText";
 
-interface UserTypeSelectionProps {
-    isVisible: boolean;
-    setSelectedUserType: React.Dispatch<React.SetStateAction<UserRole | null>>;
+interface UserTypeSelectProps {
+    setSelectedUserRole: React.Dispatch<React.SetStateAction<UserRole | null>>;
 }
 
-const UserTypeSelectionModal = ({
-    isVisible,
-    setSelectedUserType,
-}: UserTypeSelectionProps) => {
-    const ref = React.useRef<ICarouselInstance>(null);
+const UserTypeSelection = ({ setSelectedUserRole }: UserTypeSelectProps) => {
+    const [activeUserTypeIndex, setActiveUserTypeIndex] = useState(0);
+    const { width } = useWindowDimensions();
+    const x = useSharedValue(0);
+    const ITEM_WIDTH = Platform.OS === "android" ? 275 : 300;
+    const ITEM_HEIGHT = 400;
+    const MARGIN_HORIZONTAL = 40;
+    const ITEM_FULL_WIDTH = ITEM_WIDTH + MARGIN_HORIZONTAL * 2;
+    const SPACER = (width - ITEM_FULL_WIDTH) / 2;
 
-    const userTypes = Object.values(UserRole);
-    const window: ScaledSize = Dimensions.get("window");
-    const PAGE_WIDTH = window.width;
+    const userTypes: UserType[] = useMemo(
+        () => [
+            {
+                id: 1,
+                name: UserRole.PATIENT,
+                image: require("@/assets/images/patient.png"),
+                description: "",
+                verbose: "A PATIENT",
+            },
+            {
+                id: 2,
+                name: UserRole.HOSPITAL,
+                image: require("@/assets/images/hospital.png"),
+                description: "",
+                verbose: "AN HOSPITAL",
+            },
+            {
+                id: 3,
+                image: require("@/assets/images/medTransport.png"),
+                description:
+                    "",
+                name: UserRole.MED_TRANSPORT,
+                verbose: "A MEDICAL TRANSPORT PARTNER",
+            },
+        ],
+        []
+    );
 
-    const baseOptions = {
-        vertical: false,
-        width: PAGE_WIDTH * 0.85,
-        height: PAGE_WIDTH / 1.5,
-    } as const;
+    const onScroll = useAnimatedScrollHandler({
+        onScroll: (event) => {
+            x.value = event.contentOffset.x;
+        },
+    });
+
+    const onViewableItemsChanged = ({
+        viewableItems,
+    }: {
+        viewableItems: ViewToken[];
+        changed: ViewToken[];
+    }) => {
+        viewableItems &&
+            viewableItems.length > 0 &&
+            setActiveUserTypeIndex(viewableItems[0].index as number);
+    };
+
+    const viewabilityConfig = {
+        itemVisiblePercentThreshold: 50,
+    };
+
+    const viewabilityConfigCallbackPairs = useRef([
+        { viewabilityConfig, onViewableItemsChanged },
+    ]);
 
     return (
-        <Modal animationType="slide" transparent={true} visible={isVisible}>
-            <View className="absolute bottom-0 bg-white/80 dark:bg-black/90 h-[25%] w-[100%] rounded-tr-[40px] rounded-tl-[40px]">
-                <View className="mt-10 mb-6">
-                    <AppText customStyles="font-rubik text-center text-3xl mb-2">
-                        Let's get to know you better
-                    </AppText>
-                    <AppText customStyles="tex-lg text-center text-green-pale">
-                        Which of the following best describes you?
-                    </AppText>
-                </View>
-
-
-                {/* TODO: USE FLATLIST INSTEAD */}
-                <Carousel
-                    {...baseOptions}
-                    loop={true}
-                    ref={ref}
-                    style={{ width: "100%" }}
-                    autoPlay={true}
-                    autoPlayInterval={5000}
-                    data={userTypes}
-                    pagingEnabled={true}
-                    onSnapToItem={(index) =>
-                        console.log("current index:", index)
-                    }
-                    renderItem={({ index }) => (
-                        <AppButton
-                            onPress={() =>
-                                setSelectedUserType(userTypes[index])
-                            }
-                            buttonText={userTypes[index]}
-                            className="ml-[15%]"
-                            key={index}
+        <View className="flex-1 pt-20">
+            <View className="mb-10">
+                <AppText
+                    customStyles="text-3xl text-center"
+                    adjustsFontSizeToFit
+                    numberOfLines={1}
+                >
+                    Choose the character that best
+                </AppText>
+                <AppText customStyles="text-3xl text-center">
+                    reflects your true self
+                </AppText>
+            </View>
+            <Animated.FlatList
+                onScroll={onScroll}
+                viewabilityConfigCallbackPairs={
+                    viewabilityConfigCallbackPairs.current
+                }
+                ListHeaderComponent={<View />}
+                ListHeaderComponentStyle={{ width: SPACER }}
+                ListFooterComponent={<View />}
+                ListFooterComponentStyle={{ width: SPACER }}
+                data={userTypes}
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item) => item.id + item.name}
+                renderItem={({ item, index }) => {
+                    return (
+                        <UserTypeCarouselItem
+                            item={item}
+                            index={index}
+                            x={x}
+                            width={ITEM_WIDTH}
+                            height={ITEM_HEIGHT}
+                            marginHorizontal={MARGIN_HORIZONTAL}
+                            fullWidth={ITEM_FULL_WIDTH}
                         />
-                    )}
+                    );
+                }}
+                horizontal
+                scrollEventThrottle={16}
+                decelerationRate="fast"
+                snapToInterval={ITEM_FULL_WIDTH}
+            />
+            <View className="flex-1 justify-center">
+                <AppButton
+                    buttonText={`CONTINUE AS ${userTypes[activeUserTypeIndex].verbose}`}
+                    className="h-max-min w-[90%] self-center"
+                    onPress={() =>
+                        setSelectedUserRole(userTypes[activeUserTypeIndex].name)
+                    }
                 />
             </View>
-        </Modal>
+        </View>
     );
 };
 
-export default UserTypeSelectionModal;
+export default UserTypeSelection;

@@ -29,9 +29,85 @@ const UserRegistration = ({ newUserProfile, userRole, hideRegistrationModal }: U
 
   const readonlyFields: Array<keyof IUserFields> = ['email'];
 
-  const getInitialValuesByUserRole = (userRole: UserRole): IAdditionalFields[keyof IAdditionalFields] => {
-    
+  const getInitialValuesByUserRole = (
+      userRole: UserRole
+  ): IAdditionalFields[keyof IAdditionalFields] => {
+      switch (userRole) {
+          case UserRole.MED_TRANSPORT:
+              return {
+                  emergencies: [],
+                  hospital: undefined,
+                  location: {
+                      type: {
+                          formattedAddress: "",
+                          coordinates: {
+                              type: {
+                                  lat: 0,
+                                  lng: 0,
+                              },
+                              required: true,
+                          },
+                          placeId: "",
+                      },
+                      required: true,
+                  },
+                  type: undefined,
+              };
+
+          case UserRole.HOSPITAL:
+              return {
+                  availability: {
+                      beds: 0,
+                      doctors: 0,
+                  },
+                  location: {
+                      type: {
+                          formattedAddress: "",
+                          coordinates: {
+                              type: {
+                                  lat: 0,
+                                  lng: 0,
+                              },
+                              required: true,
+                          },
+                          placeId: "",
+                      },
+                      required: true,
+                  },
+                  appointments: [],
+                  emergencies: [],
+                  queue: [],
+                  specialties: [],
+                  averageResponseTimeInMins: 0,
+                  averageConsultancyPrice: 0,
+              };
+
+          case UserRole.PATIENT:
+              return {
+                  pastHealthSummary: "",
+                  knownAilments: [],
+                  healthRecord: [],
+                  location: {
+                      type: {
+                          formattedAddress: "",
+                          coordinates: {
+                              type: {
+                                  lat: 0,
+                                  lng: 0,
+                              },
+                              required: true,
+                          },
+                          placeId: "",
+                      },
+                      required: true,
+                  },
+              };
+
+          default:
+              throw new Error("Invalid user role");
+      }
   };
+
 
   return (
     <Modal

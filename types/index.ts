@@ -1,3 +1,4 @@
+import { ImageSourcePropType } from "react-native";
 interface MongoDBDocument {
     _id?: string;
 }
@@ -142,3 +143,11 @@ export enum Position {
     RIGHT = "right",
     TOP = "top",
 }
+
+export type UserType = {
+    id: number;
+    name: UserRole;
+    description: string;
+    image: ImageSourcePropType;
+    verbose: string;
+};

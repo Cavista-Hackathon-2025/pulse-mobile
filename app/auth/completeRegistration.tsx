@@ -12,10 +12,10 @@ const completeRegistration = () => {
 
     const [OTPIsVerified, setOTPIsVerified] = useState(
         !!userProfileStringified
-    ); //TODO: set to false
+    );
     const [selectedUserRole, setSelectedUserRole] = useState<UserRole | null>(
         null
-    ); // TODO: set to null
+    );
     const [userProfile, setUserProfile] = useState<Record<
         string,
         string
@@ -26,16 +26,21 @@ const completeRegistration = () => {
     );
 
     return (
-        <RootView>
+        <RootView customStyles={`flex-1 dark:bg-black/90`}>
             {selectedUserRole ? (
                 <UserRegistration
-                    
+                    userRole={selectedUserRole}
+                    hideRegistrationModal={() => setSelectedUserRole(null)}
+                    newUserProfile={userProfile}
                 />
             ) : OTPIsVerified ? (
-                <UserTypeSelection  />
+                <UserTypeSelection setSelectedUserRole={setSelectedUserRole} />
             ) : (
                 <OTPVerification
-                    
+                    email={(userProfile?.email || email) as string}
+                    OTPIsVerified={OTPIsVerified}
+                    setOTPIsVerified={setOTPIsVerified}
+                    setUserProfile={setUserProfile}
                 />
             )}
         </RootView>
