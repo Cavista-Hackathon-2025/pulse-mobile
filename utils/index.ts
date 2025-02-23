@@ -18,3 +18,6 @@ export const sendEmailOTP = async (email: string) => {
         console.log("Unable to send OTP: ", error);
     }
 };
+
+export const capitalizeString = (str: string) =>
+    str.charAt(0).toUpperCase() + str.slice(1);

@@ -25,7 +25,7 @@ export interface HealthRecord {
 
 export interface IPatient {
     pastHealthSummary?: string;
-    knownAilments?: string[];
+    knownAilments?: string;
     healthRecord?: HealthRecord[];
     location?: {
         type: {
@@ -71,7 +71,7 @@ export interface IHospital {
     appointments: string[];
     emergencies: string[];
     queue: string[];
-    specialties: string[];
+    specialties: string;
     averageResponseTimeInMins: number;
     averageConsultancyPrice: number;
 }

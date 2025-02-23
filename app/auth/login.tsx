@@ -133,7 +133,7 @@ const login = () => {
                                     </View>
                                     {/* CONTINUE BTN */}
                                     <AppButton
-                                        buttonText="CONTINUE WITH EMAIL"
+                                        buttonText="Continue with email"
                                         disabled={
                                             isSubmitting || allButtonsDisabled
                                         }

@@ -79,7 +79,7 @@ function RootLayoutNav({ user }: RootLayoutNavProps) {
                 options={{ headerShown: false }}
             />
             <Stack.Screen
-                name="(medTransport-tabs)"
+                name="(med-transport-tabs)"
                 options={{ headerShown: false }}
             />
 
